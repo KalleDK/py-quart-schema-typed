@@ -368,7 +368,7 @@ wheels = [
 
 [[package]]
 name = "quart-schema-typed"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "quart-schema" },
