@@ -1,0 +1,23 @@
+_commit: v1.3.11
+_src_path: https://github.com/KalleDK/copier-python
+copyright_date: '2026'
+copyright_holder: Kalle M. Aagaard
+copyright_holder_email: git@k-moeller.dk
+copyright_license: MIT License
+email: git@k-moeller.dk
+full_name: Kalle M. Aagaard
+gh_user: KalleDK
+git_slug: py-quart-schema-typed
+module_slug: quart_schema_typed
+pip_slug: quart-schema-typed
+project_description: Automatic quart-schema based on typing
+project_name: Quart Schema Typed
+project_version: 0.1.0
+python_version: '3.13'
+use_bumpversion: true
+use_defaults: false
+use_editorconfig: false
+use_github: true
+use_precommit: true
+use_ruff: true
+use_taskfile: true

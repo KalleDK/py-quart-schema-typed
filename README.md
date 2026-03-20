@@ -1,0 +1,1 @@
+# Quart Schema Typed
