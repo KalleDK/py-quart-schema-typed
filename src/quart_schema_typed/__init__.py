@@ -22,7 +22,7 @@ class DataclassProtocol(Protocol):
     __post_init__: Callable | None  # pyright: ignore[reportMissingTypeArgument]
 
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 QUERY_ARGS_KEY = "query_args"
