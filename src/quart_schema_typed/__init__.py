@@ -149,7 +149,7 @@ class RouteReg:
         fn = patch_tags(fn, self.tags)  # pyright: ignore[reportUnknownArgumentType]
         if self.method in [HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH]:
             fn = patch_request(fn, sig)  # pyright: ignore[reportUnknownArgumentType]
-        # fn = patch_querystring(fn, sig)  # pyright: ignore[reportUnknownArgumentType]
+        fn = patch_querystring(fn, sig)  # pyright: ignore[reportUnknownArgumentType]
         fn = patch_response(fn, sig)  # pyright: ignore[reportUnknownArgumentType]
 
         match self.method:
