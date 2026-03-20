@@ -35,7 +35,7 @@ subprocess.run([
   f"/repos/:owner/:repo/environments/{ENV_NAME}",
   "--input", "-"
 ],
-input=b''{"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}''
+input=b'"'"'{"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}'"'"'
 )
 
 subprocess.run([
@@ -63,7 +63,7 @@ subprocess.run([
   f"/repos/:owner/:repo/environments/{ENV_NAME}",
   "--input", "-"
 ],
-input=b''{"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}''
+input=b'"'"'{"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}'"'"'
 )
 
 subprocess.run([
