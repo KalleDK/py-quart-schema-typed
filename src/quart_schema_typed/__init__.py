@@ -1,11 +1,26 @@
 import inspect
+import typing as t
+from collections.abc import Callable
 from http import HTTPMethod
 from types import GenericAlias, UnionType
-from typing import Any, Literal, cast, get_args, get_origin
+from typing import TYPE_CHECKING, Any, Literal, Protocol, cast, get_args, get_origin
 
 import flask.typing as ft
 import quart
 import quart_schema
+
+if TYPE_CHECKING:
+    from attrs import AttrsInstance  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+    from msgspec import Struct  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+    from pydantic import BaseModel  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+    from pydantic.dataclasses import Dataclass  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+
+
+class DataclassProtocol(Protocol):
+    __dataclass_fields__: dict  # pyright: ignore[reportMissingTypeArgument]
+    __dataclass_params__: dict  # pyright: ignore[reportMissingTypeArgument]
+    __post_init__: Callable | None  # pyright: ignore[reportMissingTypeArgument]
+
 
 __version__ = "0.1.0"
 
@@ -84,6 +99,28 @@ def patch_tags[T](fn: T, tags: None | str | list[str]) -> T:
     return fn
 
 
+ResponseValue = t.Union[  # pyright: ignore[reportUnknownVariableType]
+    "BaseModel",
+    "list[BaseModel]",
+    "AttrsInstance",
+    "list[AttrsInstance]",
+    "Dataclass",
+    "list[Dataclass]",
+    "Struct",
+    "list[Struct]",
+    "DataclassProtocol",
+    "list[DataclassProtocol]",
+]
+
+ResponseReturnValue = t.Union[ResponseValue, tuple[ResponseValue, int]]  # pyright: ignore[reportUnknownVariableType]
+
+RouteCallable = t.Union[  # pyright: ignore[reportUnknownVariableType]
+    ft.RouteCallable,
+    t.Callable[..., ResponseReturnValue],
+    t.Callable[..., t.Awaitable[ResponseReturnValue]],
+]
+
+
 class RouteReg:
     app: quart.Quart
     method: HTTPMethod
@@ -106,26 +143,26 @@ class RouteReg:
             case _:
                 raise ValueError(f"Invalid tags: {tags}")
 
-    def __call__[T: ft.RouteCallable](self, fn: T) -> T:
-        sig = inspect.signature(fn)
+    def __call__[T: RouteCallable](self, fn: T) -> T:
+        sig = inspect.signature(fn)  # pyright: ignore[reportUnknownArgumentType]
 
-        fn = patch_tags(fn, self.tags)
+        fn = patch_tags(fn, self.tags)  # pyright: ignore[reportUnknownArgumentType]
         if self.method in [HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH]:
-            fn = patch_request(fn, sig)
-        fn = patch_querystring(fn, sig)
-        fn = patch_response(fn, sig)
+            fn = patch_request(fn, sig)  # pyright: ignore[reportUnknownArgumentType]
+        # fn = patch_querystring(fn, sig)  # pyright: ignore[reportUnknownArgumentType]
+        fn = patch_response(fn, sig)  # pyright: ignore[reportUnknownArgumentType]
 
         match self.method:
             case HTTPMethod.GET:
-                self.app.get(self.url)(fn)
+                self.app.get(self.url)(fn)  # pyright: ignore[reportArgumentType]
             case HTTPMethod.POST:
-                self.app.post(self.url)(fn)
+                self.app.post(self.url)(fn)  # pyright: ignore[reportArgumentType]
             case HTTPMethod.PUT:
-                self.app.put(self.url)(fn)
+                self.app.put(self.url)(fn)  # pyright: ignore[reportArgumentType]
             case HTTPMethod.DELETE:
-                self.app.delete(self.url)(fn)
+                self.app.delete(self.url)(fn)  # pyright: ignore[reportArgumentType]
             case HTTPMethod.PATCH:
-                self.app.patch(self.url)(fn)
+                self.app.patch(self.url)(fn)  # pyright: ignore[reportArgumentType]
             case _:
                 raise ValueError(f"Unsupported HTTP method: {self.method}")
         return fn
@@ -136,8 +173,10 @@ class RouteMgr:
 
     __slots__ = ("app",)
 
-    def __init__(self) -> None:
-        self.app = quart.Quart(__name__)
+    def __init__(self, app: quart.Quart, init_schema: bool = True) -> None:
+        if init_schema:
+            quart_schema.QuartSchema(app)
+        self.app = app
 
     def get(self, url: str, tags: None | str | list[str] = None) -> RouteReg:
         return RouteReg(app=self.app, method=HTTPMethod.GET, url=url, tags=tags)

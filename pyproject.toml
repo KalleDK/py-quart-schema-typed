@@ -28,6 +28,10 @@ test = [
     "pytest>=9.0.2",
 ]
 stubs = []
+examples = [
+    "pydantic>=2.12.5",
+    "quart>=0.20.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.9.10,<0.11.0"]
